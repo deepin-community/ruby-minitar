@@ -1,4 +1,18 @@
 #!/usr/bin/make -f
 
+include /usr/share/dpkg/pkg-info.mk
+
+export GEM2DEB_TEST_RUNNER = --check-dependencies
+
+GEMSPECPATH := usr/share/rubygems-integration/all/specifications
+
 %:
-	dh $@
+	dh $@ --buildsystem=ruby --with ruby
+
+override_dh_install:
+	dh_install
+	# create gemspec for archive-tar-minitar gem
+	cd debian/$(DEB_SOURCE)/$(GEMSPECPATH)/ && \
+	sed -e 's/s\.name = "minitar"/s.name = "archive-tar-minitar"/' \
+	  minitar-$(DEB_VERSION_UPSTREAM).gemspec \
+	  > archive-tar-minitar-$(DEB_VERSION_UPSTREAM).gemspec
